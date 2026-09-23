@@ -1892,7 +1892,7 @@ CONFIG_ZABBIX_POSTGRESQL=y
 # CONFIG_SCHROOT_UUID is not set
 # end of Configuration
 
-# CONFIG_PACKAGE_sudo is not set
+CONFIG_PACKAGE_sudo=y
 # CONFIG_PACKAGE_syslog-ng is not set
 # end of Administration
 
@@ -6787,8 +6787,8 @@ CONFIG_PACKAGE_avahi-dbus-daemon=y
 # CONFIG_PACKAGE_pdns-ixfrdist is not set
 # CONFIG_PACKAGE_pdns-recursor is not set
 # CONFIG_PACKAGE_pdns-tools is not set
-# CONFIG_PACKAGE_smartdns is not set
-# CONFIG_PACKAGE_smartdns-ui is not set
+CONFIG_PACKAGE_smartdns=y
+CONFIG_PACKAGE_smartdns-ui=y
 # CONFIG_PACKAGE_stubby is not set
 # CONFIG_PACKAGE_tor-hs is not set
 # CONFIG_PACKAGE_torsocks is not set
@@ -7428,7 +7428,7 @@ CONFIG_PACKAGE_ethtool=y
 # CONFIG_PACKAGE_gnunet is not set
 # CONFIG_PACKAGE_go-nats is not set
 # CONFIG_PACKAGE_go-wol is not set
-# CONFIG_PACKAGE_gost is not set
+CONFIG_PACKAGE_gost=y
 # CONFIG_PACKAGE_gre is not set
 # CONFIG_PACKAGE_gsocket is not set
 # CONFIG_PACKAGE_hev-socks5-server is not set
@@ -7509,7 +7509,7 @@ CONFIG_PACKAGE_libipset=y
 # CONFIG_PACKAGE_ncp is not set
 # CONFIG_PACKAGE_ndppd is not set
 # CONFIG_PACKAGE_ndptool is not set
-# CONFIG_PACKAGE_nebula is not set
+CONFIG_PACKAGE_nebula=y
 # CONFIG_PACKAGE_nebula-cert is not set
 # CONFIG_PACKAGE_net-mtools is not set
 # CONFIG_PACKAGE_net-tools-netstat is not set
@@ -7646,7 +7646,7 @@ CONFIG_PACKAGE_proto-bonding=y
 # CONFIG_PACKAGE_uacme-ualpn is not set
 CONFIG_PACKAGE_uclient-fetch=y
 # CONFIG_PACKAGE_udhcpsnoop is not set
-# CONFIG_PACKAGE_udp2raw is not set
+CONFIG_PACKAGE_udp2raw=y
 # CONFIG_PACKAGE_udphp-client is not set
 # CONFIG_PACKAGE_udptunnel is not set
 # CONFIG_PACKAGE_udpxy is not set
