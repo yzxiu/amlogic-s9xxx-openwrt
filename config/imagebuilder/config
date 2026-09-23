@@ -36,7 +36,7 @@
 CONFIG_PACKAGE_luci-app-ddns=y
 # CONFIG_PACKAGE_luci-app-diag-core is not set
 # CONFIG_PACKAGE_luci-app-dnscrypt-proxy is not set
-CONFIG_PACKAGE_luci-app-dockerman=y
+# CONFIG_PACKAGE_luci-app-dockerman is not set
 # CONFIG_PACKAGE_luci-app-dump1090 is not set
 # CONFIG_PACKAGE_luci-app-dynapoint is not set
 # CONFIG_PACKAGE_luci-app-eoip is not set
@@ -528,3 +528,15 @@ CONFIG_PACKAGE_luci-i18n-wol-zh-cn=y
 # 4. Other Configuration
 CONFIG_BUSYBOX_DEFAULT_FALLOCATE=y
 # end of 4. Other Configuration
+
+#
+# 5. Custom extra packages (yzxiu LubanCat-1 selection)
+# Enabled apps: gost nebula smartdns smartdns-ui udp2raw sudo sing-box(full)
+# Excluded: passwall/adguardhome/rclone/lighttpd/dockerman
+CONFIG_PACKAGE_gost=y
+CONFIG_PACKAGE_nebula=y
+CONFIG_PACKAGE_smartdns=y
+CONFIG_PACKAGE_smartdns-ui=y
+CONFIG_PACKAGE_udp2raw=y
+CONFIG_PACKAGE_sudo=y
+CONFIG_PACKAGE_sing-box=y
