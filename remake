@@ -1040,21 +1040,26 @@ refactor_bootfs() {
     # Check device configuration files
     [[ -f "${uenv_conf_file}" || -f "${rename_extlinux_file}" || -f "${armbianenv_conf_file}" ]] || error_msg "Missing boot configuration file [ /boot/*Env.txt ]."
 
-    # lubancat-1: 预置 mini-PCIe → mSATA overlay（让 mSATA SSD 出 /dev/sda）
-    # 详见 msata/lubancat-msata-overlay.dts（关 pcie2x1 / 开 sata2 / vcc3v3_pcie 常开 / sdmmc0 限速 50MHz）
+    # lubancat-1: 预置板级 overlay（U-Boot 读 user_overlays，逐个 fdt apply）
+    #   msata/lubancat-msata.dtbo : 关 pcie2x1 / 开 sata2 / vcc3v3_pcie 常开 / sdmmc0 限速 50MHz → SSD 出 /dev/sda
+    #   fan/lubancat-fan-pwm.dtbo : 使能 pwm0（GPIO0_B7 = PWM0_M0），供用户态温控守护 fan-thermal 调速
+    # 注：rootfs 侧的文件不在这里放，而是由 different-files/lubancat-1/rootfs/ 自动注入。
     if [[ "${board}" == "lubancat-1" ]]; then
-        msata_src="${current_path}/msata"
-        if [[ -f "${msata_src}/lubancat-msata.dtbo" && -f "${armbianenv_conf_file}" ]]; then
-            mkdir -p overlay-user
-            cp -f "${msata_src}/lubancat-msata.dtbo" overlay-user/
-            if grep -q "^user_overlays=" "${armbianenv_conf_file}"; then
-                sed -i "s|^user_overlays=.*|user_overlays=lubancat-msata|" "${armbianenv_conf_file}"
+        bootfs_overlays=""
+        for overlay_item in msata/lubancat-msata fan/lubancat-fan-pwm; do
+            if [[ -f "${current_path}/${overlay_item}.dtbo" ]]; then
+                mkdir -p overlay-user
+                cp -f "${current_path}/${overlay_item}.dtbo" overlay-user/
+                bootfs_overlays="${bootfs_overlays:+${bootfs_overlays} }${overlay_item##*/}"
             else
-                echo "user_overlays=lubancat-msata" >> "${armbianenv_conf_file}"
+                echo -e "${WARNING} [ lubancat-1 ] ${overlay_item}.dtbo not found, skipped."
             fi
-            echo -e "${INFO} [ lubancat-1 ] Preloaded mSATA overlay: overlay-user/lubancat-msata.dtbo + user_overlays=lubancat-msata"
-        else
-            [[ -f "${armbianenv_conf_file}" ]] && echo -e "${WARNING} [ lubancat-1 ] msata/lubancat-msata.dtbo not found, skipped mSATA preload."
+        done
+        if [[ -n "${bootfs_overlays}" && -f "${armbianenv_conf_file}" ]]; then
+            grep -q "^user_overlays=" "${armbianenv_conf_file}" \
+                && sed -i "s|^user_overlays=.*|user_overlays=${bootfs_overlays}|" "${armbianenv_conf_file}" \
+                || echo "user_overlays=${bootfs_overlays}" >>"${armbianenv_conf_file}"
+            echo -e "${INFO} [ lubancat-1 ] Preloaded bootfs overlays: overlay-user/*.dtbo + user_overlays=${bootfs_overlays}"
         fi
     fi
 }
