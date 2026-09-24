@@ -1,0 +1,20 @@
+#!/bin/sh
+# LubanCat-1: 强制出厂默认主题为 bootstrap
+#
+# 背景（为什么需要这个脚本）：
+#   luci-theme-material 自带 /etc/uci-defaults/30_luci-theme-material，其中会执行
+#       set luci.main.mediaurlbase=/luci-static/material
+#   而 /etc/init.d/boot 是 `( . "./$file" )` 逐个 source，并未设置 PKG_UPGRADE=1，
+#   所以该分支会真的生效。字母序上 30_luci-theme-bootstrap 先跑、
+#   30_luci-theme-material 后跑 → 最终 mediaurlbase 被 material 覆盖。
+#   本机不需要 material，已从 config/imagebuilder/config 移除该包；
+#   此脚本作为兜底（99- 排在所有 30_ 之后），保证默认主题永远是 bootstrap。
+#
+# 本脚本只在首次启动执行一次，之后被删除；用户后续在 LuCI 里换主题依然有效果。
+[ -f /etc/config/luci ] || exit 0
+
+uci set luci.main.mediaurlbase='/luci-static/bootstrap'
+uci delete luci.themes.Material 2>/dev/null
+uci commit luci
+
+exit 0
