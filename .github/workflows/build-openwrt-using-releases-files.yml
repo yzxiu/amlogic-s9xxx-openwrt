@@ -466,7 +466,7 @@ jobs:
                -o "${armsr_tarfile_path}/${openwrt_filename}"
           [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1
 
-          echo "build_tag=OpenWrt_${{ matrix.branch }}_${{ inputs.openwrt_storage }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
+          echo "build_tag=OpenWrt_${{ matrix.branch }}_${{ inputs.openwrt_storage }}_$(date +"%Y.%m.%d.%H.%M.%S")" >> ${GITHUB_ENV}
           df -hT ${PWD}
           echo "REPO_URL=${REPO_URL}" >> ${GITHUB_ENV}
           echo "REPO_NAME=${REPO_NAME}" >> ${GITHUB_ENV}
