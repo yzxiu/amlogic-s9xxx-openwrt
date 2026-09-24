@@ -1039,6 +1039,24 @@ refactor_bootfs() {
 
     # Check device configuration files
     [[ -f "${uenv_conf_file}" || -f "${rename_extlinux_file}" || -f "${armbianenv_conf_file}" ]] || error_msg "Missing boot configuration file [ /boot/*Env.txt ]."
+
+    # lubancat-1: 预置 mini-PCIe → mSATA overlay（让 mSATA SSD 出 /dev/sda）
+    # 详见 msata/lubancat-msata-overlay.dts（关 pcie2x1 / 开 sata2 / vcc3v3_pcie 常开 / sdmmc0 限速 50MHz）
+    if [[ "${board}" == "lubancat-1" ]]; then
+        msata_src="${current_path}/msata"
+        if [[ -f "${msata_src}/lubancat-msata.dtbo" && -f "${armbianenv_conf_file}" ]]; then
+            mkdir -p overlay-user
+            cp -f "${msata_src}/lubancat-msata.dtbo" overlay-user/
+            if grep -q "^user_overlays=" "${armbianenv_conf_file}"; then
+                sed -i "s|^user_overlays=.*|user_overlays=lubancat-msata|" "${armbianenv_conf_file}"
+            else
+                echo "user_overlays=lubancat-msata" >> "${armbianenv_conf_file}"
+            fi
+            echo -e "${INFO} [ lubancat-1 ] Preloaded mSATA overlay: overlay-user/lubancat-msata.dtbo + user_overlays=lubancat-msata"
+        else
+            [[ -f "${armbianenv_conf_file}" ]] && echo -e "${WARNING} [ lubancat-1 ] msata/lubancat-msata.dtbo not found, skipped mSATA preload."
+        fi
+    fi
 }
 
 refactor_rootfs() {
