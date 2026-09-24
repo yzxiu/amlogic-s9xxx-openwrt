@@ -9,6 +9,10 @@
 name: Build OpenWrt using ImageBuilder
 
 on:
+  push:
+    branches:
+      - main
+      - master
   repository_dispatch:
   workflow_dispatch:
     inputs:
@@ -384,14 +388,18 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Build OpenWrt rootfs [ ${{ inputs.releases_branch }} ]
+      - name: Build OpenWrt rootfs [ ${{ inputs.releases_branch || 'immortalwrt:25.12.2' }} ]
         id: imagebuilder
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         run: |
-          RELEASES_BRANCH="${{ inputs.releases_branch }}"
+          RELEASES_BRANCH="${{ inputs.releases_branch || 'immortalwrt:25.12.2' }}"
           chmod +x ${IMAGEBUILDER_SH}
           ${IMAGEBUILDER_SH} ${RELEASES_BRANCH}
           echo "build_tag=OpenWrt_imagebuilder_${RELEASES_BRANCH/:/_}_$(date +"%Y.%m.%d.%H.%M.%S")" >> ${GITHUB_ENV}
+          # 取最近一次 commit message 作为 release 更新说明
+          echo "COMMIT_MSG<<EOF123" >> ${GITHUB_ENV}
+          git log -1 --pretty=%B >> ${GITHUB_ENV}
+          echo "EOF123" >> ${GITHUB_ENV}
           df -hT ${PWD}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
@@ -412,13 +420,13 @@ jobs:
         uses: ./
         with:
           openwrt_path: output/*rootfs.tar.gz
-          openwrt_ip: ${{ inputs.openwrt_ip }}
-          openwrt_board: ${{ inputs.openwrt_board }}
-          openwrt_kernel: ${{ inputs.openwrt_kernel }}
-          auto_kernel: ${{ inputs.auto_kernel }}
-          kernel_repo: ${{ inputs.kernel_repo }}
-          kernel_usage: ${{ inputs.kernel_usage }}
-          builder_name: ${{ inputs.builder_name }}
+          openwrt_ip: ${{ inputs.openwrt_ip || '192.168.1.1' }}
+          openwrt_board: ${{ inputs.openwrt_board || 'lubancat-1' }}
+          openwrt_kernel: ${{ inputs.openwrt_kernel || '6.18.y' }}
+          auto_kernel: ${{ inputs.auto_kernel || 'true' }}
+          kernel_repo: ${{ inputs.kernel_repo || 'ophub/kernel' }}
+          kernel_usage: ${{ inputs.kernel_usage || 'stable' }}
+          builder_name: ${{ inputs.builder_name || 'ophub' }}
 
       - name: Upload packaged OpenWrt to Release
         uses: ophub/upload-to-releases@main
@@ -432,6 +440,9 @@ jobs:
           make_latest: true
           gh_token: ${{ secrets.GITHUB_TOKEN }}
           body: |
+            ### 📝 本次更新内容 (Commit Message)
+            ${{ env.COMMIT_MSG }}
+            ---
             ### OpenWrt Image Information
             - Default IP: `192.168.1.1`
             - Default username: `root`
