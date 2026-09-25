@@ -542,3 +542,7 @@ CONFIG_PACKAGE_luci-i18n-smartdns-zh-cn=y
 CONFIG_PACKAGE_udp2raw=y
 CONFIG_PACKAGE_sudo=y
 CONFIG_PACKAGE_sing-box=y
+# WireGuard VPN. kmod-wireguard 会被 luci-proto-wireguard 依赖自动拉入(ImageBuilder rootfs 阶段为官方 6.12.103 模块), remake 换 ophub 6.18.53 内核时经 remake:909/974 自动替换为 6.18.53 版 wireguard.ko(CONFIG_WIREGUARD=m), etc/modules.d/wireguard 开机加载保留
+CONFIG_PACKAGE_kmod-wireguard=y
+CONFIG_PACKAGE_wireguard-tools=y
+CONFIG_PACKAGE_luci-proto-wireguard=y
